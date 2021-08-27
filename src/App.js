@@ -1,15 +1,10 @@
 import "./App.css";
+import Login from "./components/Login";
 
 function App() {
   return (
     <div className="app">
-      <h1>I will build Spotify Clone🚀</h1>
-
-      {/* Spotify Logo*/}
-
-      {/* Login with spotify button*/}
-
-      
+      <Login />
     </div>
   );
 }
