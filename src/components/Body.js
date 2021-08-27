@@ -1,22 +1,79 @@
 import React from "react";
 import "./Body.css";
+import { useDataLayerValue } from "./DataLayer";
 import Header from "./Header";
+import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
+import FavoriteIcon from "@material-ui/icons/Favorite";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import SongRow from "./SongRow";
 
 function Body({ spotify }) {
+  const [{ discover_weekly }, dispatch] = useDataLayerValue();
+
+  const playPlaylist = (id) => {
+    spotify
+      .play({
+        context_uri: `spotify:playlist:37i9dQZEVXcJZyENOWUFo7`,
+      })
+      .then((res) => {
+        spotify.getMyCurrentPlayingTrack().then((r) => {
+          dispatch({
+            type: "SET_ITEM",
+            item: r.item,
+          });
+          dispatch({
+            type: "SET_PLAYING",
+            playing: true,
+          });
+        });
+      });
+  };
+
+  const playSong = (id) => {
+    spotify
+      .play({
+        uris: [`spotify:track:${id}`],
+      })
+      .then((res) => {
+        spotify.getMyCurrentPlayingTrack().then((r) => {
+          dispatch({
+            type: "SET_ITEM",
+            item: r.item,
+          });
+          dispatch({
+            type: "SET_PLAYING",
+            playing: true,
+          });
+        });
+      });
+  };
+
   return (
     <div className="body">
       <Header spotify={spotify} />
 
       <div className="body__info">
-        <img
-          src="https://newjams-images.scdn.co/v2/discover-weekly/tvj1oDdu54CpbRg4KH1hCn5KIVx4tBDjeV2H3rgJkavUD4kh329TMEsjqidjivVifLRW03Pwp4gi1fuC3R-rt7pKb9YBBlSy1BLeyPTsg-Fpsk-b_5-R7UkXL5SLw5P7T9cIFng37j9SOL1WTpIIT8gnPAXrnJRqNVikKaLdjr1I1DmH2W7q4Bfwky1lq_T-XqLOX7EXraA3fqnuKe-1OQkcEL1kmKzMiOnuF4jnvxEBWKeEdX25frYoagW37oKPuCNAwF_nGBKFfrWjEADpCYqG6KP5o4gtWdkS7VAkWyEF7slGYZls2ntncL8BPjy-oMwhmU74D_FlCmdmYfgf55mGITuWS5Csa3NBBqNB2ms=/OTA6MzA6NTFUMzItNTAtMA==/default"
-          alt=""
-        />
+        <img src={discover_weekly?.images[0].url} alt="" />
         <div className="body__infoText">
           <strong>PLAYLIST</strong>
           <h2>Discover Weekly</h2>
-          <p>description...</p>
+          <p>{discover_weekly?.description}</p>
         </div>
+      </div>
+
+      <div className="body__songs">
+        <div className="body__icons">
+          <PlayCircleFilledIcon
+            className="body__shuffle"
+            onClick={playPlaylist}
+          />
+          <FavoriteIcon fontSize="large" />
+          <MoreHorizIcon />
+        </div>
+
+        {discover_weekly?.tracks.items.map((item) => (
+          <SongRow playSong={playSong} track={item.track} />
+        ))}
       </div>
     </div>
   );
